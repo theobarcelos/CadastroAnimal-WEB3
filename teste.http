@@ -1,0 +1,7 @@
+GET http://localhost:3010/qtdVacina
+
+###
+GET http://localhost:3010/vacina/3
+
+### 
+DELETE http://localhost:3010/deletevacina/1

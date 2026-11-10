@@ -192,7 +192,7 @@ async function excluirVacina(
 
     const response =
       await fetch(
-        `${url}/carregarVacina?id=${id}`,
+        `${url}/deletevacina?id=${id}`,
         {
           method: "DELETE",
         }
@@ -690,7 +690,7 @@ async function exibaVacina(url: string) {
             </div>
 
             <div className="modal-actions">
-
+                {`/cadastro-vacinas?id=${vacinaSelecionada.id_vacina}`}
               <button
                 className="editar-btn"
                 onClick={() => {
@@ -712,6 +712,7 @@ async function exibaVacina(url: string) {
                   )
                 }
               >
+                {vacinaSelecionada.id_vacina} &nbsp;
                 Excluir
               </button>
 

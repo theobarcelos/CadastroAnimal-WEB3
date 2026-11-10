@@ -284,12 +284,11 @@ app.listen(port, () => {
 
 app.delete("/usuario/:id", async (req, res) => {
   // parametro via http (url)
-  const ID = req.params.id
-  const cn = await Conectar();
-  const resultado = await cn
-    .request()
-    .input('id', sql.Int, ID)
+  const id = parseInt(req.params.id);
 
+  const cn = await Conectar();
+  const resultado = await cn.request()
+    .input('id', sql.Int, id)
     .query(`
       DELETE FROM USUARIO
       OUTPUT DELETED. *
@@ -306,6 +305,72 @@ app.delete("/usuario/:id", async (req, res) => {
 
   // mandar resposta para usuario
   res.json({
-    "id": ID
+    "id": id
   });
 })
+
+
+app.get('/vacina/:id', async (req, resp) => {
+    try {
+        // Pegar ID da URL
+        const id = parseInt(req.params.id);
+
+        // FAZER  A CONTAGEM DE REGISTRO
+        const cn = await Conectar();
+        const resultado = await cn.request()
+           .input('id', sql.Int, id)
+           .query("SELECT *  FROM VACINA WHERE id_vacina = @id");
+        resp.json(resultado.recordset[0]);
+    }
+    catch (error) {
+        resp.json({ "tipo de erro ": error })
+    }
+})
+
+// DELETE
+app.delete('/deletevacina/:id', async (req, res) => {
+    try {
+        // Pegar o ID da URL
+        const id = parseInt(req.params.id);
+        // Conectar ao SQL Server
+        const cn = await Conectar();
+        // Executar DELETE
+        const result = await cn
+            .request()
+            .input('id', sql.Int, id)
+            .query(`
+                DELETE FROM VACINA
+                OUTPUT DELETED.*
+                WHERE id_vacina = @id
+
+                DELETE FROM LOTE_VACINA
+                OUTPUT DELETED.*
+                WHERE id_vacina = @id
+                `);
+
+        // Verificar se encontrou a vacina
+        if (result.recordset.length === 0) {
+            return res.status(404).json({
+                mensagem: 'Vacina não encontrada'
+            });
+
+        }
+
+        // Retornar confirmação
+        res.status(200).json({
+            mensagem: 'Vacina excluída com sucesso!',
+            vacina: result.recordset[0]
+        });
+
+    } catch (erro) {
+
+        console.error('Erro:', erro);
+
+        res.status(500).json({
+            erro: 'Erro ao excluir vacina',
+            detalhe: erro.message
+        });
+
+    }
+
+});

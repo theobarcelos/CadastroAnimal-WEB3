@@ -122,16 +122,16 @@ export default function CadastroVacinaPage() {
       try {
 
         const response =
-          await fetch("/api/vacinas");
-
-        const vacinas =
-          await response.json();
+          await fetch(`http://localhost:3010/vacina/${vacinaId}`);
 
         const vacina =
-          vacinas.find(
-            (v: any) =>
-              v.id === Number(vacinaId)
-          );
+          await response.json();
+
+        // const vacina =
+        //   vacinas.find(
+        //     (v: any) =>
+        //       v.id === Number(vacinaId)
+        //   );
 
         if (!vacina) {
           return;
@@ -207,11 +207,9 @@ export default function CadastroVacinaPage() {
         </div>
 
         <Formik
-          initialValues={
-            dadosIniciais
-          }
+          initialValues={dadosIniciais}
           enableReinitialize
-          validationSchema={vacinaSchema}
+          // validationSchema={vacinaSchema}
           onSubmit={async (
             values,
             { resetForm }
