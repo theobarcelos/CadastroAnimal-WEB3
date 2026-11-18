@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import "./DashboardCards.css";
 
 import {
@@ -10,6 +11,9 @@ import {
 } from "lucide-react";
 
 export default function DashboardCards() {
+
+  const [qtdVacina, setQtdVacina] = useState(0);
+
   const cards = [
     {
       title: "Animais Cadastrados",
@@ -31,10 +35,24 @@ export default function DashboardCards() {
 
     {
       title: "Vacinas Registradas",
-      value: "8",
+      value: qtdVacina,
       icon: <Syringe />,
     },
   ];
+
+  const quantidadeVacina = async () => {
+    try {
+      const url = await fetch("http://localhost:3010/qtdVacina");
+      const quantidade = await url.json();
+      setQtdVacina(quantidade.qtd);
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  useEffect(() => {
+    quantidadeVacina();
+  }, [])
 
   return (
     <div className="cards-container">
