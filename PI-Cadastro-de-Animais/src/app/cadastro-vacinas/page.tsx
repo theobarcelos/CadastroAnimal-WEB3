@@ -11,13 +11,6 @@ import {
   useState
 } from "react";
 
-
-
-
-
-
-
-
 const vacinaSchema = Yup.object({
   nomeVacina: Yup.string()
     .required("Informe o nome da vacina"),
@@ -109,7 +102,7 @@ export default function CadastroVacinaPage() {
     searchParams.get("id");
 
   const modoEdicao =
-    vacinaId !== null;
+    vacinaId !== null;    
 
   useEffect(() => {
 

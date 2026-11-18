@@ -17,6 +17,8 @@ app.use(express.json());
 // Aplicando cors no agente (navegador)
 app.use(cors());
 
+// GET
+
 // Saída de resposta são chamado de rotas
 app.get('/qtd', async (req, res) => {
   // Fazer conexão com o Banco
@@ -34,9 +36,9 @@ app.get("/qtdVacina", async (req, res) => {
   try {
     const cn = await Conectar();
     const resultado = await cn.request().query("SELECT COUNT(*) AS total FROM dbo.VACINA");
-    res.json({ 'qtd': resultado.recordset[0].total});
-  } catch(e) {
-    res.json({ 'erro': e.message});
+    res.json({ 'qtd': resultado.recordset[0].total });
+  } catch (e) {
+    res.json({ 'erro': e.message });
   }
 
 })
@@ -45,8 +47,8 @@ app.get("/carregarVacina", async (req, res) => {
   try {
     const cn = await Conectar();
     const resultado = await cn
-    .request()
-    .query(`
+      .request()
+      .query(`
       SELECT 
         v.id_vacina, 
         v.nome, 
@@ -58,8 +60,8 @@ app.get("/carregarVacina", async (req, res) => {
         l.quantidade_recebida 
       FROM 
         dbo.VACINA v
-      INNER JOIN dbo.FABRICANTE f ON v.id_vacina = f.id_fabricante
-      INNER JOIN dbo.LOTE_VACINA l ON v.id_vacina = l.id_lote_vacina`);
+        INNER JOIN dbo.LOTE_VACINA l ON v.id_vacina = l.id_vacina
+        INNER JOIN dbo.FABRICANTE f ON l.id_fabricante = f.id_fabricante`);
     res.json(
       resultado.recordset
     )
@@ -67,6 +69,48 @@ app.get("/carregarVacina", async (req, res) => {
     res.json({ 'erro': e.message })
   }
 })
+
+app.get('/vacina/:id', async (req, resp) => {
+  try {
+    // Pegar ID da URL
+    const id = parseInt(req.params.id);
+
+    // FAZER  A CONTAGEM DE REGISTRO
+    const cn = await Conectar();
+    const resultado = await cn.request()
+      .input('id', sql.Int, id)
+      .query(`SELECT 
+                v.id_vacina,
+                v.nome,
+                v.tipo_de_vacina,
+                v.especie_do_animal,
+                v.descricao,
+                v.arm_temp_ideal AS temperatura,
+                v.armazenamento_local AS localArmazenamento,
+                f.nome AS nome_fabricante,
+                l.numero_lote,
+                l.data_fabricacao,
+                l.data_validade,
+                l.quantidade_recebida,
+                l.data_de_entrada_vacina AS dataEntrada,
+                l.responsavel_aplicacao,
+                l.fornecedor_vacina,
+                l.nota_fiscal_vacina,
+                l.valor_unitario_vacina AS valorUnitario,
+                l.valor_total_vacina AS valorTotal
+              FROM 
+                dbo.VACINA v
+              INNER JOIN dbo.LOTE_VACINA l ON v.id_vacina = l.id_vacina
+              INNER JOIN dbo.FABRICANTE f ON l.id_fabricante = f.id_fabricante
+              WHERE v.id_vacina = @id`);
+    resp.json(resultado.recordset);
+  }
+  catch (error) {
+    resp.json({ "tipo de erro ": error })
+  }
+})
+
+// POST 
 
 // <<==== Inserir Animais ====>>
 app.post("/cadAnimais", async (req, res) => {
@@ -146,7 +190,7 @@ app.post("/cadVacinas", async (req, res) => {
 
 
     const cn = await Conectar();
-    
+
     const campo = await cn.request()
       .input("nomeVacina", sql.VarChar(150), nomeVacina)
       .input("tipoVacina", sql.VarChar(100), tipoVacina)
@@ -238,7 +282,6 @@ app.post("/cadVacinas", async (req, res) => {
   }
 })
 
-
 // Inserir dados
 app.post("/INSERT", async (req, res) => {
   const nome = req.body.nome;
@@ -275,12 +318,7 @@ app.post("/INSERT", async (req, res) => {
 
 });
 
-// CRIAR A EXECUÇÃO DO SERViDOR
-app.listen(port, () => {
-  console.log(`servidor http://localhost:${port}`);
-})
-
-// delete
+// DELETE
 
 app.delete("/usuario/:id", async (req, res) => {
   // parametro via http (url)
@@ -309,68 +347,54 @@ app.delete("/usuario/:id", async (req, res) => {
   });
 })
 
-
-app.get('/vacina/:id', async (req, resp) => {
-    try {
-        // Pegar ID da URL
-        const id = parseInt(req.params.id);
-
-        // FAZER  A CONTAGEM DE REGISTRO
-        const cn = await Conectar();
-        const resultado = await cn.request()
-           .input('id', sql.Int, id)
-           .query("SELECT *  FROM VACINA WHERE id_vacina = @id");
-        resp.json(resultado.recordset[0]);
-    }
-    catch (error) {
-        resp.json({ "tipo de erro ": error })
-    }
-})
-
-// DELETE
 app.delete('/deletevacina/:id', async (req, res) => {
-    try {
-        // Pegar o ID da URL
-        const id = parseInt(req.params.id);
-        // Conectar ao SQL Server
-        const cn = await Conectar();
-        // Executar DELETE
-        const result = await cn
-            .request()
-            .input('id', sql.Int, id)
-            .query(`
-                DELETE FROM VACINA
+  try {
+    // Pegar o ID da URL
+    const id = parseInt(req.params.id);
+    // Conectar ao SQL Server
+    const cn = await Conectar();
+    // Executar DELETE
+    const result = await cn
+      .request()
+      .input('id', sql.Int, id)
+      .query(`
+                DELETE FROM LOTE_VACINA
                 OUTPUT DELETED.*
                 WHERE id_vacina = @id
-
-                DELETE FROM LOTE_VACINA
+                
+                DELETE FROM VACINA
                 OUTPUT DELETED.*
                 WHERE id_vacina = @id
                 `);
 
-        // Verificar se encontrou a vacina
-        if (result.recordset.length === 0) {
-            return res.status(404).json({
-                mensagem: 'Vacina não encontrada'
-            });
-
-        }
-
-        // Retornar confirmação
-        res.status(200).json({
-            mensagem: 'Vacina excluída com sucesso!',
-            vacina: result.recordset[0]
-        });
-
-    } catch (erro) {
-
-        console.error('Erro:', erro);
-
-        res.status(500).json({
-            erro: 'Erro ao excluir vacina',
-            detalhe: erro.message
-        });
+    // Verificar se encontrou a vacina
+    if (result.recordset.length === 0) {
+      return res.status(404).json({
+        mensagem: 'Vacina não encontrada'
+      });
 
     }
 
+    // Retornar confirmação
+    res.status(200).json({
+      mensagem: 'Vacina excluída com sucesso!',
+      vacina: result.recordset[0]
+    });
+
+  } catch (erro) {
+
+    console.error('Erro:', erro);
+
+    res.status(500).json({
+      erro: 'Erro ao excluir vacina',
+      detalhe: erro.message
+    });
+
+  }
+
 });
+
+// CRIAR A EXECUÇÃO DO SERViDOR
+app.listen(port, () => {
+  console.log(`servidor http://localhost:${port}`);
+})

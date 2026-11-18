@@ -12,11 +12,11 @@ export interface Vacina {
 
   status: string;
 
-  fornecedor: string;
-  responsavel: string;
+  fornecedor_vacina: string;
+  responsavel_aplicacao: string;
   dataEntrada: string;
-  dataFabricacao: string;
-  notaFiscal: string;
+  data_fabricacao: string;
+  nota_fiscal_vacina: string;
 
   valorUnitario: number;
   valorTotal: number;

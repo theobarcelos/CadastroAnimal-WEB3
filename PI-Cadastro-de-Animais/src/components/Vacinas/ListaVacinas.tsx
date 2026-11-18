@@ -11,7 +11,7 @@ import {
 } from "react";
 
 import { Vacina }
-from "@/types/vacina";
+  from "@/types/vacina";
 
 export default function ListaVacinas() {
 
@@ -19,18 +19,18 @@ export default function ListaVacinas() {
   const [qtd, setQtd] = useState(0);
 
   // ==== 2° Criar uma URL de servidor Express
-  const url : string = 'http://localhost:3010';
+  const url: string = 'http://localhost:3010';
 
   // ==== 3° Criar uma função para ler a quantidade
   async function qtdVacina() {
-    try{
-      
+    try {
+
       // Link
       await fetch(`${url}/qtdVacina`)
-      .then((resp) => { return resp.json() })
-      .then((dado) => { setQtd(dado.qtd) })
+        .then((resp) => { return resp.json() })
+        .then((dado) => { setQtd(dado.qtd) })
       // Envia
-      
+
     } catch (e) {
       console.warn("Erro: " + e);
     }
@@ -46,7 +46,7 @@ export default function ListaVacinas() {
 
   const [especieFiltro,
     setEspecieFiltro] =
-      useState("");
+    useState("");
 
   const [
     vacinaSelecionada,
@@ -58,8 +58,8 @@ export default function ListaVacinas() {
   }, []);
 
   const [vacinas, setVacinas] =
-  useState<Vacina[]>([]);
-  
+    useState<Vacina[]>([]);
+
   let filteredVacinas =
     vacinas.filter((vacina) => {
 
@@ -81,7 +81,7 @@ export default function ListaVacinas() {
 
       const matchTipo =
         tipoFiltro === "" ||
-        vacina.tipo_de_vacina  === tipoFiltro;
+        vacina.tipo_de_vacina === tipoFiltro;
 
       const matchEspecie =
         especieFiltro === "" ||
@@ -140,149 +140,143 @@ export default function ListaVacinas() {
     }
   }
 
-function calcularStatus(vacina: Vacina) {
+  function calcularStatus(vacina: Vacina) {
 
-  const hoje =
-    new Date();
+    const hoje =
+      new Date();
 
-  const validade =
-    new Date(vacina.data_validade);
+    const validade =
+      new Date(vacina.data_validade);
 
-  const diferencaDias =
-    Math.ceil(
-      (
-        validade.getTime() -
-        hoje.getTime()
-      ) /
-      (1000 * 60 * 60 * 24)
-    );
-
-  // vencida
-  if (diferencaDias < 0) {
-    return "vencida";
-  }
-
-  // vence em até 30 dias
-  if (diferencaDias <= 30) {
-    return "vencendo";
-  }
-
-  // estoque baixo
-  if (vacina.quantidade_recebida <= 5) {
-    return "baixo";
-  }
-
-  return "ok";
-}
-
-async function excluirVacina(
-  id: number
-) {
-
-  const confirmar =
-    window.confirm(
-      "Deseja realmente excluir esta vacina?"
-    );
-
-  if (!confirmar) {
-    return;
-  }
-
-  try {
-
-    const response =
-      await fetch(
-        `${url}/deletevacina?id=${id}`,
-        {
-          method: "DELETE",
-        }
+    const diferencaDias =
+      Math.ceil(
+        (
+          validade.getTime() -
+          hoje.getTime()
+        ) /
+        (1000 * 60 * 60 * 24)
       );
 
-    if (!response.ok) {
-
-      throw new Error(
-        "Erro ao excluir"
-      );
-
+    // vencida
+    if (diferencaDias < 0) {
+      return "vencida";
     }
 
-    setVacinas(
-      vacinas.filter(
-        vacina =>
-          vacina.id_vacina !== id
-      )
-    );
+    // vence em até 30 dias
+    if (diferencaDias <= 30) {
+      return "vencendo";
+    }
 
-    setVacinaSelecionada(null);
+    // estoque baixo
+    if (vacina.quantidade_recebida <= 5) {
+      return "baixo";
+    }
 
-    alert(
-      "Vacina excluída com sucesso!"
-    );
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Erro ao excluir vacina"
-    );
-
+    return "ok";
   }
 
-}
+  async function excluirVacina(
+    id: number
+  ) {
 
-
-
-useEffect(() => {
-
-  carregarVacinas();
-
-}, []);
-
-async function carregarVacinas() {
-
-  try {
-
-    const response =
-      await fetch(
-        `${url}/carregarVacina`
+    const confirmar =
+      window.confirm(
+        "Deseja realmente excluir esta vacina?"
       );
 
-    const data =
-      await response.json();
+    if (!confirmar) {
+      return;
+    }
 
-    setVacinas(data);
-
-  } catch (error) {
-
-    console.error(
-      "Erro ao carregar vacinas:",
-      error
-    );
-
-  }
-
-} 
-
-async function exibaVacina(url: string) {
     try {
-      const caminho = url + "/carregarVacina";
-      await fetch(caminho)
-        .then((resp) => resp.json())
-        .then((data) => setVacinas(data))
 
-    } catch (e) {
-          console.log(`erro:${e}`);
+      const response =
+        await fetch(
+          `${url}/deletevacina?id=${id}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+      if (!response.ok) {
+
+        throw new Error(
+          "Erro ao excluir"
+        );
+
+      }
+
+      setVacinas(
+        vacinas.filter(
+          vacina =>
+            vacina.id_vacina !== id
+        )
+      );
+
+      setVacinaSelecionada(null);
+
+      alert(
+        "Vacina excluída com sucesso!"
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Erro ao excluir vacina"
+      );
+
     }
+
   }
 
 
 
- useEffect(() => {
-     exibaVacina(url);
-   // carregarVacinas();
+  useEffect(() => {
+
+    carregarVacinas();
 
   }, []);
+
+  async function carregarVacinas() {
+
+    try {
+
+      const response =
+        await fetch(
+          `${url}/carregarVacina`
+        );
+
+      const data =
+        await response.json();
+
+      setVacinas(data);
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao carregar vacinas:",
+        error
+      );
+
+    }
+
+  }
+
+  async function exibaVacina(id: Number) {
+    try {
+      const caminho = await fetch(`${url}/vacina/${id}`);
+      const data = await caminho.json();
+      
+      if (data && data.length > 0) {
+        setVacinaSelecionada(data[0]);
+      }
+      
+    } catch (e) {
+      console.log(`erro:${e}`);
+    }
+  } 
 
 
   return (
@@ -311,25 +305,25 @@ async function exibaVacina(url: string) {
 
         <div className="info-card">
 
-            <h3>
-              Total de Doses
-            </h3>
+          <h3>
+            Total de Doses
+          </h3>
 
-            <span>
+          <span>
 
-              {
-                vacinas.reduce(
-                  (total, vacina) =>
-                    total + vacina.quantidade_recebida,
-                  0
-                )
-              }
+            {
+              vacinas.reduce(
+                (total, vacina) =>
+                  total + vacina.quantidade_recebida,
+                0
+              )
+            }
 
-            </span>
+          </span>
 
-          </div>
+        </div>
 
-          <div className="info-card">
+        <div className="info-card">
 
           <h3>Estoque Baixo</h3>
 
@@ -518,18 +512,18 @@ async function exibaVacina(url: string) {
 
                   <span
                     className={
-                    `status-badge
+                      `status-badge
                     ${getStatusClass(
                         calcularStatus(vacina)
-                    )}`
-                  }
+                      )}`
+                    }
                   >
 
-                   {getStatusText(
-                    calcularStatus(vacina)
-                  )}
+                    {getStatusText(
+                      calcularStatus(vacina)
+                    )}
 
-                  </span>   
+                  </span>
 
                 </td>
 
@@ -539,7 +533,7 @@ async function exibaVacina(url: string) {
 
                     <button
                       onClick={() =>
-                        setVacinaSelecionada(vacina)
+                        exibaVacina(vacina.id_vacina)
                       }
                     >
                       Detalhes
@@ -621,7 +615,7 @@ async function exibaVacina(url: string) {
                 </strong>
                 {" "}
                 {
-                 vacinaSelecionada.dataFabricacao
+                  vacinaSelecionada.data_fabricacao
                 }
               </p>
 
@@ -649,12 +643,12 @@ async function exibaVacina(url: string) {
 
               <p>
                 <strong>Fornecedor:</strong>{" "}
-                {vacinaSelecionada.fornecedor}
+                {vacinaSelecionada.fornecedor_vacina}
               </p>
 
               <p>
                 <strong>Responsável:</strong>{" "}
-                {vacinaSelecionada.responsavel}
+                {vacinaSelecionada.responsavel_aplicacao}
               </p>
 
               <p>
@@ -664,7 +658,7 @@ async function exibaVacina(url: string) {
 
               <p>
                 <strong>Nota Fiscal:</strong>{" "}
-                {vacinaSelecionada.notaFiscal}
+                {vacinaSelecionada.nota_fiscal_vacina}
               </p>
 
               <p>
@@ -690,7 +684,7 @@ async function exibaVacina(url: string) {
             </div>
 
             <div className="modal-actions">
-                {`/cadastro-vacinas?id=${vacinaSelecionada.id_vacina}`}
+              {`/cadastro-vacinas?id=${vacinaSelecionada.id_vacina}`}
               <button
                 className="editar-btn"
                 onClick={() => {
