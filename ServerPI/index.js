@@ -318,6 +318,32 @@ app.post("/INSERT", async (req, res) => {
 
 });
 
+app.put("/atualizarVacina/:id", async (req, res) => {
+  try {
+    const {
+      nomeVacina,
+      tipoVacina,
+      especie,
+      fabricante,
+      descricao,
+      numeroLote,
+      dataFabricacao,
+      dataValidade,
+      quantidadeRecebida,
+      dataEntrada,
+      responsavel,
+      fornecedor,
+      notaFiscal,
+      valorUnitario,
+      valorTotal,
+      temperatura,
+      localArmazenamento,
+    } = req.body
+  } catch (e) {
+
+  }
+})
+
 // DELETE
 
 app.delete("/usuario/:id", async (req, res) => {

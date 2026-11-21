@@ -131,36 +131,36 @@ export default function CadastroVacinaPage() {
         }
 
         setDadosIniciais({
-          nomeVacina: vacina.nome || "",
-          tipoVacina: vacina.tipo || "",
-          especie: vacina.especie || "",
-          fabricante: vacina.fabricante || "",
-          descricao: vacina.descricao || "",
-          numeroLote: vacina.lote || "",
+          nomeVacina: vacina[0].nome || "",
+          tipoVacina: vacina[0].tipo_de_vacina || "",
+          especie: vacina[0].especie_do_animal || "",
+          fabricante: vacina[0].nome_fabricante || "",
+          descricao: vacina[0].descricao || "",
+          numeroLote: vacina[0].numero_lote || "",
           dataFabricacao:
-            vacina.dataFabricacao || "",
+            vacina[0].data_fabricacao.split('T')[0] || "",
           dataValidade:
-            vacina.validade || "",
+            vacina[0].data_validade.split('T')[0] || "",
           quantidadeRecebida:
-            vacina.quantidade || "",
+            vacina[0].quantidade_recebida || "",
           dataEntrada:
-            vacina.dataEntrada || "",
+            vacina[0].dataEntrada.split('T')[0] || "",
           responsavel:
-            vacina.responsavel || "",
+            vacina[0].responsavel_aplicacao || "",
           fornecedor:
-            vacina.fornecedor || "",
+            vacina[0].fornecedor_vacina || "",
           notaFiscal:
-            vacina.notaFiscal || "",
+            vacina[0].nota_fiscal_vacina || "",
           valorUnitario:
-            vacina.valorUnitario || "",
+            vacina[0].valorUnitario || "",
           valorTotal:
-            vacina.valorTotal || "",
+            vacina[0].valorTotal || "",
           temperatura:
-            vacina.temperatura || "",
+            vacina[0].temperatura || "",
           localArmazenamento:
-            vacina.localArmazenamento || "",
+            vacina[0].localArmazenamento || "",
           refrigeracao:
-            vacina.refrigeracao || false,
+            vacina[0].refrigeracao || false,
         });
 
       } catch (error) {
@@ -230,7 +230,7 @@ export default function CadastroVacinaPage() {
                 localArmazenamento: values.localArmazenamento
               }
 
-              const url = modoEdicao ? "http://localhost:3010/UPDATE" : "http://localhost:3010/cadVacinas"
+              const url = modoEdicao ? "http://localhost:3010/atualizarVacina" : "http://localhost:3010/cadVacinas"
 
               const response =
                 await fetch(url, {
@@ -303,6 +303,7 @@ export default function CadastroVacinaPage() {
                     <Field
                       name="nomeVacina"
                       type="text"
+                      value={dadosIniciais.nomeVacina}
                     />
 
                     <ErrorMessage

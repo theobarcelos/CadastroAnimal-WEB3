@@ -5,3 +5,6 @@ GET http://localhost:3010/vacina/1
 
 ### 
 DELETE http://localhost:3010/deletevacina/1
+
+### 
+GET http://localhost:3010/vacina/1
