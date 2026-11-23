@@ -320,6 +320,9 @@ app.post("/INSERT", async (req, res) => {
 
 app.put("/atualizarVacina/:id", async (req, res) => {
   try {
+
+    const id = parseInt(req.params.id);
+
     const {
       nomeVacina,
       tipoVacina,
@@ -338,9 +341,67 @@ app.put("/atualizarVacina/:id", async (req, res) => {
       valorTotal,
       temperatura,
       localArmazenamento,
-    } = req.body
-  } catch (e) {
+    } = req.body;
 
+    const cn = await Conectar();
+    const campo = await cn.request()
+      .input("id", sql.Int, id)
+      .input("nomeVacina", sql.VarChar(150), nomeVacina)
+      .input("tipoVacina", sql.VarChar(100), tipoVacina)
+      .input("especie", sql.VarChar(100), especie)
+      .input("fabricante", sql.VarChar(100), fabricante)
+      .input("descricao", sql.VarChar(255), descricao)
+      .input("numeroLote", sql.VarChar(50), numeroLote)
+      .input("dataFabricacao", sql.Date, dataFabricacao)
+      .input("dataValidade", sql.Date, dataValidade)
+      .input("quantidadeRecebida", sql.Int, quantidadeRecebida)
+      .input("dataEntrada", sql.Date, dataEntrada)
+      .input("responsavel", sql.VarChar(100), responsavel)
+      .input("fornecedor", sql.VarChar(150), fornecedor)
+      .input("notaFiscal", sql.VarChar(50), notaFiscal)
+      .input("valorUnitario", sql.Decimal(10, 2), valorUnitario)
+      .input("valorTotal", sql.Decimal(10, 2), valorTotal)
+      .input("temperatura", sql.VarChar(100), temperatura)
+      .input("localArmazenamento", sql.VarChar(100), localArmazenamento)
+      .query(`
+      UPDATE dbo.VACINA
+        SET
+          nome = @nomeVacina,
+          tipo_de_vacina = @tipoVacina,
+          especie_do_animal = @especie,
+          descricao = @descricao,
+          arm_temp_ideal = @temperatura,
+          armazenamento_local = @localArmazenamento
+      WHERE id_vacina = @id;
+
+      UPDATE f
+        SET
+          f.nome = @fabricante
+      FROM dbo.FABRICANTE f
+      INNER JOIN dbo.LOTE_VACINA l ON f.id_fabricante = l.id_fabricante
+      WHERE l.id_vacina = @id;
+
+      UPDATE dbo.LOTE_VACINA
+      SET
+          numero_lote = @numeroLote,
+          data_fabricacao = @dataFabricacao,
+          data_validade = @dataValidade,
+          quantidade_recebida = @quantidadeRecebida,
+          data_de_entrada_vacina = @dataEntrada,
+          responsavel_aplicacao = @responsavel,
+          fornecedor_vacina = @fornecedor,
+          nota_fiscal_vacina = @notaFiscal,
+          valor_unitario_vacina = @valorUnitario,
+          valor_total_vacina = @valorTotal
+      WHERE id_vacina = @id`
+      );
+    res.status(200).json({
+      "MS": "VACINA ATUALIZADA COM SUCESSO"
+    })
+
+  } catch (e) {
+    console.error("Erro ao atualizar vacina:", e);
+    return res.status(500).json({ erro: "Erro ao atualizar vacina", detalhe: e.message });
   }
 })
 
@@ -386,7 +447,7 @@ app.delete('/deletevacina/:id', async (req, res) => {
       .query(`
                 DELETE FROM LOTE_VACINA
                 OUTPUT DELETED.*
-                WHERE id_vacina = @id
+                WHERE id_vacina = @id;
                 
                 DELETE FROM VACINA
                 OUTPUT DELETED.*

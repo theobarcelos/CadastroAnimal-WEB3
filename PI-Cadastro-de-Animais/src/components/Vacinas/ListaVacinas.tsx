@@ -192,7 +192,7 @@ export default function ListaVacinas() {
 
       const response =
         await fetch(
-          `${url}/deletevacina?id=${id}`,
+          `${url}/deletevacina/${id}`,
           {
             method: "DELETE",
           }
@@ -684,7 +684,7 @@ export default function ListaVacinas() {
             </div>
 
             <div className="modal-actions">
-              {`/cadastro-vacinas?id=${vacinaSelecionada.id_vacina}`}
+              <p style={{backgroundColor: "#2c2828", alignSelf: "center", padding: "10px", borderRadius: "16px"}}>{`/cadastro-vacinas?id=${vacinaSelecionada.id_vacina}`}</p>
               <button
                 className="editar-btn"
                 onClick={() => {

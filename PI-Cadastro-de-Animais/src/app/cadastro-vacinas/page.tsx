@@ -137,14 +137,14 @@ export default function CadastroVacinaPage() {
           fabricante: vacina[0].nome_fabricante || "",
           descricao: vacina[0].descricao || "",
           numeroLote: vacina[0].numero_lote || "",
-          dataFabricacao:
-            vacina[0].data_fabricacao.split('T')[0] || "",
-          dataValidade:
-            vacina[0].data_validade.split('T')[0] || "",
+          dataFabricacao: 
+            vacina[0].data_fabricacao ? vacina[0].data_fabricacao.split('T')[0] : "",
+          dataValidade: 
+            vacina[0].data_validade ? vacina[0].data_validade.split('T')[0] : "",
           quantidadeRecebida:
             vacina[0].quantidade_recebida || "",
-          dataEntrada:
-            vacina[0].dataEntrada.split('T')[0] || "",
+          dataEntrada: 
+            vacina[0].dataEntrada ? vacina[0].dataEntrada.split('T')[0] : "",
           responsavel:
             vacina[0].responsavel_aplicacao || "",
           fornecedor:
@@ -203,7 +203,7 @@ export default function CadastroVacinaPage() {
           initialValues={dadosIniciais}
           enableReinitialize
           // validationSchema={vacinaSchema}
-          onSubmit={async (
+          onSubmit={ async (
             values,
             { resetForm }
           ) => {
@@ -230,7 +230,7 @@ export default function CadastroVacinaPage() {
                 localArmazenamento: values.localArmazenamento
               }
 
-              const url = modoEdicao ? "http://localhost:3010/atualizarVacina" : "http://localhost:3010/cadVacinas"
+              const url = modoEdicao ? `http://localhost:3010/atualizarVacina/${vacinaId}` : "http://localhost:3010/cadVacinas"
 
               const response =
                 await fetch(url, {
@@ -303,7 +303,6 @@ export default function CadastroVacinaPage() {
                     <Field
                       name="nomeVacina"
                       type="text"
-                      value={dadosIniciais.nomeVacina}
                     />
 
                     <ErrorMessage
@@ -332,7 +331,7 @@ export default function CadastroVacinaPage() {
                         V10
                       </option>
 
-                      <option value="Antirrabica">
+                      <option value="Antirrábica">
                         Antirrábica
                       </option>
 
@@ -358,15 +357,15 @@ export default function CadastroVacinaPage() {
                         Selecione
                       </option>
 
-                      <option value="cao">
+                      <option value="Cão">
                         Cão
                       </option>
 
-                      <option value="gato">
+                      <option value="Gato">
                         Gato
                       </option>
 
-                      <option value="ambos">
+                      <option value="Ambos">
                         Ambos
                       </option>
                     </Field>
